@@ -106,7 +106,7 @@
   .pill.cy{color:var(--cyan);border-color:rgba(125,228,245,.35)}
 
   /* ── hero ──────────────────────────────────── */
-  header{position:relative;padding:clamp(24px,4vh,52px) 0 0;overflow:hidden;
+  header{position:relative;padding:clamp(24px,4vh,52px) 0 clamp(52px,9vh,112px);overflow:hidden;
     background:
       radial-gradient(ellipse at 78% 8%, rgba(46,68,112,.85) 0%, rgba(6,10,28,0) 62%),
       linear-gradient(180deg,#0D1636 0%,#060A1C 88%);
@@ -1059,12 +1059,19 @@
     });
   });
 
-  /* liens internes qui pointent vers une autre vue */
-  var map={'newsletter':'accueil','outils':'outils','scene':'scene','parcours':'profil','qui':'profil','metier':'accueil','chiffres':'accueil'};
+  /* liens internes : bascule sur la vue qui contient la cible, puis défile jusqu'à elle */
   Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'),function(a){
     if(a.hasAttribute('data-view')||a.classList.contains('skip')) return;
-    var t=a.getAttribute('href').slice(1);
-    if(map[t]){ a.addEventListener('click',function(ev){ ev.preventDefault(); show(map[t]); }); }
+    var id=a.getAttribute('href').slice(1);
+    var el=document.getElementById(id);
+    if(!el) return;
+    var view=el.closest ? el.closest('.view') : null;
+    a.addEventListener('click',function(ev){
+      ev.preventDefault();
+      if(view){ show(view.id.replace('v-',''), false); }
+      var y=el.getBoundingClientRect().top+window.pageYOffset-74;
+      window.scrollTo({top:y<0?0:y, behavior:'smooth'});
+    });
   });
 
   show('accueil', false);
